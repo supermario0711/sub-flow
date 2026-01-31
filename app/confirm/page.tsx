@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getConfirmedBox } from "@/lib/services/box";
 import { getSimulation } from "@/lib/simulation/state";
@@ -6,6 +5,7 @@ import { getSimulatedNow } from "@/lib/simulation/clock";
 import { getTimeMode, getHoursUntilLock } from "@/lib/simulation/time";
 import { SimulationBanner } from "@/components/simulation/simulation-banner";
 import { ConfirmContent } from "@/components/confirm/confirm-content";
+import { editBox } from "@/app/actions/box";
 
 export const metadata = {
   title: "Box Confirmed | Biokiste",
@@ -48,12 +48,14 @@ export default async function ConfirmPage() {
       />
 
       {hours > 0 && (
-        <Link
-          href="/box"
-          className="btn btn-outline mt-6 w-full min-h-[44px] transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 motion-reduce:transition-none"
-        >
-          Edit Box
-        </Link>
+        <form action={editBox.bind(null, box.id)}>
+          <button
+            type="submit"
+            className="btn btn-outline mt-6 w-full min-h-[44px] transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 motion-reduce:transition-none"
+          >
+            Edit Box
+          </button>
+        </form>
       )}
 
       {/* Recipe teaser — Phase 6 */}

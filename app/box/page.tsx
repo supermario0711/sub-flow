@@ -9,6 +9,7 @@ import { getSuggestedItems, getSwapSuggestions } from "@/lib/services/suggestion
 import { getSimulation } from "@/lib/simulation/state";
 import { getSimulatedNow } from "@/lib/simulation/clock";
 import { getTimeMode, getHoursUntilLock } from "@/lib/simulation/time";
+import { autoConfirmBox } from "@/app/actions/box";
 import { SimulationBanner } from "@/components/simulation/simulation-banner";
 import { BoxView } from "@/components/box/box-view";
 
@@ -80,8 +81,11 @@ export default async function BoxPage() {
   const hours = getHoursUntilLock(box.lock_at, simulatedNow);
   const timeMode = getTimeMode(hours);
 
-  // Confirmed + deadline passed → redirect to confirmation page
-  if (box.status === "confirmed" && hours <= 0) {
+  // Deadline passed → auto-confirm if draft, then redirect to confirmation
+  if (hours <= 0) {
+    if (box.status === "draft") {
+      await autoConfirmBox(box.id);
+    }
     redirect("/confirm");
   }
 

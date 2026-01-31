@@ -53,6 +53,7 @@ export function BoxView({
 }: BoxViewProps) {
   const [swapTarget, setSwapTarget] = useState<BoxItemWithItem | null>(null);
   const [showAddSheet, setShowAddSheet] = useState(false);
+  const [isConfirmedLocal, setIsConfirmedLocal] = useState(box.status === "confirmed");
   const [, startTransition] = useTransition();
   const [isResetting, startResetTransition] = useTransition();
   const prefersReducedMotion = useReducedMotion();
@@ -71,6 +72,8 @@ export function BoxView({
       const result = await swapItem(box.id, target.id, newItemId);
       if (!result.success) {
         alert(result.error);
+      } else {
+        setIsConfirmedLocal(false);
       }
     });
   };
@@ -80,6 +83,8 @@ export function BoxView({
       const result = await removeItem(box.id, boxItem.id);
       if (!result.success) {
         alert(result.error);
+      } else {
+        setIsConfirmedLocal(false);
       }
     });
   };
@@ -213,13 +218,13 @@ export function BoxView({
         </button>
       )}
 
-      {box.status === "confirmed" && timeLayout !== "locked" && (
+      {isConfirmedLocal && timeLayout !== "locked" && (
         <div role="status" className="alert alert-success mb-2 mt-6">
           <span>Your box is confirmed. You can still make changes until the deadline.</span>
         </div>
       )}
 
-      <ConfirmButton boxId={box.id} timeLayout={timeLayout} isConfirmed={box.status === "confirmed"} />
+      <ConfirmButton boxId={box.id} timeLayout={timeLayout} isConfirmed={isConfirmedLocal} />
 
       {timeLayout === "urgent" && (
         <>

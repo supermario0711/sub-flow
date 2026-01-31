@@ -333,6 +333,24 @@ We're using the A2UI protocol for adaptive UI generation.
 
 ---
 
+## Phase 3.3: Box Status Transitions & Lock Routing ✅
+
+**Goal:** Fix and clarify how box status transitions (locked, confirmed, editing) interact with routing
+
+**Status:** Completed 2026-01-31 — 32/33 tests passed, 1 not tested ([test logs](test-logs/))
+
+**Outcomes:**
+- [x] Auto-confirm at deadline — draft boxes at 0 hours are confirmed and redirected to `/confirm`
+- [x] Lock routing — any box at 0 hours redirects to `/confirm` regardless of prior status
+- [x] Revert on edit — swapping or removing on a confirmed box reverts status to `draft`
+- [x] Edit Box from `/confirm` — server action reverts to `draft` and redirects to `/box`
+- [x] Re-confirm after edit works with updated `confirmed_at`
+- [x] Path revalidation for `/box` and `/confirm` after all mutations
+
+**Exit Criteria:** ~~Status transitions and lock routing work correctly~~ Met — All core flows verified across personas and time modes
+
+---
+
 ## Phase 4: Learning & Suggestions ✅
 
 **Goal:** System detects patterns and shows smart suggestions

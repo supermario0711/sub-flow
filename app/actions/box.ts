@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { recalculatePatterns } from "@/lib/services/patterns";
+import { getSimulation } from "@/lib/simulation/state";
+import { getSimulatedNow } from "@/lib/simulation/clock";
+import { getHoursUntilLock } from "@/lib/simulation/time";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -12,6 +15,46 @@ function isValidUuid(value: string): boolean {
 }
 
 type ActionResult = { success: true } | { success: false; error: string };
+
+/**
+ * Checks if a box is locked based on simulation time context.
+ */
+async function isBoxLocked(lockAt: string): Promise<boolean> {
+  const sim = await getSimulation();
+  const simulatedNow = getSimulatedNow(lockAt, sim.hoursUntilLock);
+  const hours = getHoursUntilLock(lockAt, simulatedNow);
+  return hours <= 0;
+}
+
+/**
+ * Auto-confirms a draft box when the deadline passes.
+ * Does not redirect — the caller handles navigation.
+ * Note: No revalidatePath here since this runs during render (not as a user action).
+ * The subsequent redirect will cause a fresh page load anyway.
+ */
+export async function autoConfirmBox(boxId: string): Promise<ActionResult> {
+  if (!isValidUuid(boxId)) {
+    return { success: false, error: "Invalid request." };
+  }
+
+  const supabase = await createClient();
+
+  const { error: updateError } = await supabase
+    .from("boxes")
+    .update({
+      status: "confirmed",
+      confirmed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", boxId)
+    .eq("status", "draft");
+
+  if (updateError) {
+    return { success: false, error: "Failed to auto-confirm box." };
+  }
+
+  return { success: true };
+}
 
 /**
  * Swaps an item in a box for a different item.
@@ -30,7 +73,7 @@ export async function swapItem(
   // Fetch box
   const { data: box, error: boxError } = await supabase
     .from("boxes")
-    .select("id, user_id, status")
+    .select("id, user_id, status, lock_at")
     .eq("id", boxId)
     .single();
 
@@ -40,6 +83,10 @@ export async function swapItem(
 
   if (box.status !== "draft" && box.status !== "confirmed") {
     return { success: false, error: "This box can no longer be edited." };
+  }
+
+  if (await isBoxLocked(box.lock_at)) {
+    return { success: false, error: "Box is locked." };
   }
 
   // Verify boxItemId belongs to this box
@@ -86,9 +133,21 @@ export async function swapItem(
     to_item_id: newItemId,
   });
 
+  // Revert confirmed box to draft on edit
+  if (box.status === "confirmed") {
+    const { error: revertError } = await supabase
+      .from("boxes")
+      .update({ status: "draft", updated_at: new Date().toISOString() })
+      .eq("id", boxId);
+    if (revertError) {
+      return { success: false, error: "Failed to update box status." };
+    }
+  }
+
   await recalculatePatterns(box.user_id);
 
   revalidatePath("/box");
+  revalidatePath("/confirm");
   return { success: true };
 }
 
@@ -107,7 +166,7 @@ export async function removeItem(
 
   const { data: box, error: boxError } = await supabase
     .from("boxes")
-    .select("id, status")
+    .select("id, status, lock_at, user_id")
     .eq("id", boxId)
     .single();
 
@@ -117,6 +176,10 @@ export async function removeItem(
 
   if (box.status !== "draft" && box.status !== "confirmed") {
     return { success: false, error: "This box can no longer be edited." };
+  }
+
+  if (await isBoxLocked(box.lock_at)) {
+    return { success: false, error: "Box is locked." };
   }
 
   // Verify boxItemId belongs to this box
@@ -140,8 +203,43 @@ export async function removeItem(
     return { success: false, error: "Failed to remove item. Please try again." };
   }
 
+  // Revert confirmed box to draft on edit
+  if (box.status === "confirmed") {
+    const { error: revertError } = await supabase
+      .from("boxes")
+      .update({ status: "draft", updated_at: new Date().toISOString() })
+      .eq("id", boxId);
+    if (revertError) {
+      return { success: false, error: "Failed to update box status." };
+    }
+  }
+
+  await recalculatePatterns(box.user_id);
+
   revalidatePath("/box");
+  revalidatePath("/confirm");
   return { success: true };
+}
+
+/**
+ * Reverts a confirmed box back to draft so the user can edit it.
+ */
+export async function editBox(boxId: string): Promise<never> {
+  if (!isValidUuid(boxId)) {
+    redirect("/box");
+  }
+
+  const supabase = await createClient();
+
+  await supabase
+    .from("boxes")
+    .update({ status: "draft", updated_at: new Date().toISOString() })
+    .eq("id", boxId)
+    .eq("status", "confirmed");
+
+  revalidatePath("/box");
+  revalidatePath("/confirm");
+  redirect("/box");
 }
 
 /**
