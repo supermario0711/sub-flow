@@ -37,7 +37,7 @@ For this hackathon, we're building a prototype for weekly vegetable box subscrip
 - 10 items total (5 vegetables, 5 fruits)
 - 5 items per box
 - Single user flow (but simulated multi-user for demo)
-- Web only
+- Mobile-first web app (designed for phone screens, scales up to desktop)
 
 **The "Wow" Moments:**
 1. Same app feels completely different based on time pressure
@@ -170,9 +170,11 @@ This is the secret weapon for impressive demos.
 - Accent: Soft terracotta `#D4A574`
 
 **Principles:**
+- Mobile-first: design for phone screens, then scale up
 - Generous whitespace
 - Soft shadows, no hard edges
 - Smooth animations on state changes
+- Touch-friendly tap targets (minimum 44×44px)
 - Photography-style AI images, not illustrations
 
 ---
@@ -299,7 +301,7 @@ We're using the A2UI protocol for adaptive UI generation.
 - [ ] Loading states with skeletons
 - [ ] Box image generation on confirm
 - [ ] Confirmation page shows generated image
-- [ ] Mobile responsive
+- [ ] Mobile-first design verified across all flows
 
 **Exit Criteria:** Confirming box shows beautiful AI image with celebration
 
@@ -388,7 +390,7 @@ We're using the A2UI protocol for adaptive UI generation.
 **Should Have:**
 - [ ] Recipe gallery with generated content
 - [ ] Smooth animations
-- [ ] Mobile-friendly
+- [ ] Desktop-responsive (scales up gracefully from mobile)
 
 **Nice to Have:**
 - [ ] Full A2UI integration with Vertex AI
