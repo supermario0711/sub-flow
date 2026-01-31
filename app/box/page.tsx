@@ -5,6 +5,7 @@ import {
   getActiveVacation,
   getSkippedBox,
 } from "@/lib/services/box";
+import { getSuggestedItems } from "@/lib/services/suggestions";
 import { getSimulation } from "@/lib/simulation/state";
 import { getSimulatedNow } from "@/lib/simulation/clock";
 import { getTimeMode, getHoursUntilLock } from "@/lib/simulation/time";
@@ -84,7 +85,10 @@ export default async function BoxPage() {
     redirect("/confirm");
   }
 
-  const availableItems = await getAvailableSwapItems(box.id);
+  const [availableItems, suggestedItems] = await Promise.all([
+    getAvailableSwapItems(box.id),
+    getSuggestedItems(box.id),
+  ]);
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-12">
@@ -112,6 +116,7 @@ export default async function BoxPage() {
         timeMode={sim.hoursUntilLock !== null ? timeMode : "relaxed"}
         hoursUntilLock={sim.hoursUntilLock !== null ? hours : 999}
         availableItems={availableItems}
+        suggestedItems={suggestedItems}
         vacation={vacation}
         userSlug={sim.userSlug}
       />

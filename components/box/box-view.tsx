@@ -10,6 +10,8 @@ import { UrgentBanner } from "./urgent-banner";
 import { SkipButton } from "./skip-button";
 import { VacationCard } from "./vacation-card";
 import { VacationBanner } from "./vacation-banner";
+import { QuickAdd } from "./quick-add";
+import { AddSheet } from "./add-sheet";
 import { swapItem, removeItem } from "@/app/actions/box";
 import { resetAllBoxes } from "@/app/actions/reset";
 
@@ -21,6 +23,7 @@ type BoxViewProps = {
   timeMode: TimeMode;
   hoursUntilLock: number;
   availableItems: Pick<Item, "id" | "name" | "emoji" | "category">[];
+  suggestedItems?: Pick<Item, "id" | "name" | "emoji" | "category">[];
   vacation?: Vacation | null;
   isSkipped?: boolean;
   userSlug?: string;
@@ -38,11 +41,13 @@ export function BoxView({
   timeMode,
   hoursUntilLock,
   availableItems,
+  suggestedItems = [],
   vacation,
   isSkipped,
   userSlug,
 }: BoxViewProps) {
   const [swapTarget, setSwapTarget] = useState<BoxItemWithItem | null>(null);
+  const [showAddSheet, setShowAddSheet] = useState(false);
   const [, startTransition] = useTransition();
   const [isResetting, startResetTransition] = useTransition();
 
@@ -143,6 +148,25 @@ export function BoxView({
         </div>
       )}
 
+      {timeLayout !== "locked" && !isSkipped && suggestedItems.length > 0 && (
+        <QuickAdd
+          boxId={box.id}
+          suggestions={suggestedItems}
+          onOpenSheet={() => setShowAddSheet(true)}
+        />
+      )}
+
+      {timeLayout === "browsing" && !isSkipped && (
+        <button
+          type="button"
+          onClick={() => setShowAddSheet(true)}
+          aria-label="Add item to box"
+          className="btn btn-primary btn-outline w-full mt-4 min-h-[44px] transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 motion-reduce:transition-none"
+        >
+          Add Item
+        </button>
+      )}
+
       {box.status === "confirmed" && timeLayout !== "locked" && (
         <div role="status" className="alert alert-success mb-2 mt-6">
           <span>Your box is confirmed. You can still make changes until the deadline.</span>
@@ -170,6 +194,13 @@ export function BoxView({
           availableItems={availableItems}
           onSelect={handleSwapSelect}
           onClose={() => setSwapTarget(null)}
+        />
+      )}
+
+      {showAddSheet && (
+        <AddSheet
+          boxId={box.id}
+          onClose={() => setShowAddSheet(false)}
         />
       )}
     </>
