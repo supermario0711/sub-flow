@@ -232,18 +232,20 @@ We're using the A2UI protocol for adaptive UI generation.
 
 ---
 
-## Phase 1: Foundation
+## Phase 1: Foundation ✅
 
 **Goal:** Working Next.js app with data layer and basic routing
 
-**Outcomes:**
-- [ ] Project scaffolded with chosen stack
-- [ ] Database schema defined and migrated
-- [ ] Seed data: 10 items, 3 test users with history
-- [ ] Basic pages exist (box, confirm, recipes)
-- [ ] Can fetch and display box items from database
+**Status:** Completed 2026-01-31 — All tests passing ([test logs](test-logs/))
 
-**Exit Criteria:** Can see a list of items in a box on screen
+**Outcomes:**
+- [x] Project scaffolded with chosen stack
+- [x] Database schema defined and migrated
+- [x] Seed data: 10 items, 3 test users with history
+- [x] Basic pages exist (box, confirm, recipes)
+- [x] Can fetch and display box items from database
+
+**Exit Criteria:** ~~Can see a list of items in a box on screen~~ Met — `/box` renders 5 items for Sarah&apos;s draft box from Supabase
 
 ---
 
