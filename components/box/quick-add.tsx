@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import type { Item } from "@/lib/types/database";
 import { addItem } from "@/app/actions/add-item";
 
@@ -12,6 +13,7 @@ type QuickAddProps = {
 
 export function QuickAdd({ boxId, suggestions, onOpenSheet }: QuickAddProps) {
   const [isPending, startTransition] = useTransition();
+  const prefersReducedMotion = useReducedMotion();
 
   const handleAdd = (itemId: string) => {
     startTransition(async () => {
@@ -24,18 +26,25 @@ export function QuickAdd({ boxId, suggestions, onOpenSheet }: QuickAddProps) {
 
   return (
     <div className="mt-4 flex flex-wrap gap-2">
-      {suggestions.map((item) => (
-        <button
+      {suggestions.map((item, i) => (
+        <motion.button
           key={item.id}
           type="button"
           disabled={isPending}
           onClick={() => handleAdd(item.id)}
           aria-label={`Add ${item.name} to box`}
-          className="btn btn-sm btn-outline gap-1 min-h-[44px] transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 motion-reduce:transition-none"
+          initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            duration: 0.2,
+            delay: prefersReducedMotion ? 0 : i * 0.03,
+          }}
+          whileTap={prefersReducedMotion ? undefined : { scale: 0.93 }}
+          className="btn btn-sm btn-outline gap-1 min-h-[44px] transition-colors duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 motion-reduce:transition-none"
         >
           <span role="img" aria-hidden="true">{item.emoji}</span>
           {item.name}
-        </button>
+        </motion.button>
       ))}
       <button
         type="button"

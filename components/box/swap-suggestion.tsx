@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import type { SwapSuggestion as SwapSuggestionType } from "@/lib/types/patterns";
 import { acceptSuggestion, rejectSuggestion } from "@/app/actions/suggestions";
 
@@ -11,12 +12,15 @@ type SwapSuggestionProps = {
 
 export function SwapSuggestionCard({ suggestion, boxId }: SwapSuggestionProps) {
   const [dismissed, setDismissed] = useState(false);
+  const [accepted, setAccepted] = useState(false);
   const [isAccepting, startAccepting] = useTransition();
   const [, startRejecting] = useTransition();
+  const prefersReducedMotion = useReducedMotion();
 
-  if (dismissed) return null;
+  if (dismissed || accepted) return null;
 
   const handleAccept = () => {
+    setAccepted(true);
     startAccepting(async () => {
       const result = await acceptSuggestion(
         boxId,
@@ -25,6 +29,7 @@ export function SwapSuggestionCard({ suggestion, boxId }: SwapSuggestionProps) {
         suggestion.toItem.id
       );
       if (!result.success) {
+        setAccepted(false);
         alert(result.error);
       }
     });
@@ -38,10 +43,21 @@ export function SwapSuggestionCard({ suggestion, boxId }: SwapSuggestionProps) {
   };
 
   return (
-    <div
+    <motion.div
+      layout={!prefersReducedMotion}
+      initial={prefersReducedMotion ? false : { opacity: 0, y: -16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={
+        prefersReducedMotion
+          ? { opacity: 0 }
+          : accepted
+            ? { opacity: 0, scale: 1.05, transition: { duration: 0.2 } }
+            : { opacity: 0, x: 80, transition: { duration: 0.2 } }
+      }
+      transition={{ duration: 0.3 }}
       role="region"
       aria-label={`Suggestion: swap ${suggestion.fromItem.name} for ${suggestion.toItem.name}`}
-      className="card card-border bg-base-100 p-4 transition-all duration-300 motion-reduce:transition-none"
+      className="card card-border bg-base-100 p-4 transition-colors duration-300 motion-reduce:transition-none"
     >
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 text-lg">
@@ -67,7 +83,7 @@ export function SwapSuggestionCard({ suggestion, boxId }: SwapSuggestionProps) {
           disabled={isAccepting}
           className="btn btn-primary btn-sm min-h-[44px] min-w-[44px] flex-1 transition-all duration-300 focus:ring-2 focus:ring-primary focus:ring-offset-2 motion-reduce:transition-none"
         >
-          {isAccepting ? "Swapping…" : "Accept"}
+          {isAccepting ? "Swapping\u2026" : "Accept"}
         </button>
         <button
           type="button"
@@ -77,6 +93,6 @@ export function SwapSuggestionCard({ suggestion, boxId }: SwapSuggestionProps) {
           Dismiss
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

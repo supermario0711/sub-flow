@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Box, BoxItemWithItem, Item, Vacation } from "@/lib/types/database";
 import type { SwapSuggestion } from "@/lib/types/patterns";
 import type { TimeMode } from "@/lib/simulation/time";
@@ -54,6 +55,7 @@ export function BoxView({
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [, startTransition] = useTransition();
   const [isResetting, startResetTransition] = useTransition();
+  const prefersReducedMotion = useReducedMotion();
 
   const timeLayout = getTimeLayout(timeMode, hoursUntilLock);
 
@@ -89,6 +91,21 @@ export function BoxView({
         alert(result.error);
       }
     });
+  };
+
+  const itemVariant = {
+    hidden: prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 },
+    show: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        delay: prefersReducedMotion ? 0 : i * 0.05,
+      },
+    }),
+    exit: prefersReducedMotion
+      ? { opacity: 0 }
+      : { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   };
 
   // Skipped state
@@ -132,13 +149,15 @@ export function BoxView({
 
       {timeLayout !== "locked" && !isSkipped && swapSuggestions.length > 0 && (
         <div className="mb-4 flex flex-col gap-3">
-          {swapSuggestions.map((suggestion) => (
-            <SwapSuggestionCard
-              key={suggestion.patternId}
-              suggestion={suggestion}
-              boxId={box.id}
-            />
-          ))}
+          <AnimatePresence>
+            {swapSuggestions.map((suggestion) => (
+              <SwapSuggestionCard
+                key={suggestion.patternId}
+                suggestion={suggestion}
+                boxId={box.id}
+              />
+            ))}
+          </AnimatePresence>
         </div>
       )}
 
@@ -152,15 +171,26 @@ export function BoxView({
               : "flex flex-col gap-3"
           }
         >
-          {items.map((boxItem) => (
-            <BoxItemCard
-              key={boxItem.id}
-              boxItem={boxItem}
-              timeLayout={timeLayout}
-              onSwap={handleSwap}
-              onRemove={handleRemove}
-            />
-          ))}
+          <AnimatePresence mode="popLayout">
+            {items.map((boxItem, i) => (
+              <motion.div
+                key={boxItem.id}
+                layout={!prefersReducedMotion}
+                variants={itemVariant}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                custom={i}
+              >
+                <BoxItemCard
+                  boxItem={boxItem}
+                  timeLayout={timeLayout}
+                  onSwap={handleSwap}
+                  onRemove={handleRemove}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 

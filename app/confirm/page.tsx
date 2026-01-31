@@ -5,6 +5,7 @@ import { getSimulation } from "@/lib/simulation/state";
 import { getSimulatedNow } from "@/lib/simulation/clock";
 import { getTimeMode, getHoursUntilLock } from "@/lib/simulation/time";
 import { SimulationBanner } from "@/components/simulation/simulation-banner";
+import { ConfirmContent } from "@/components/confirm/confirm-content";
 
 export const metadata = {
   title: "Box Confirmed | Biokiste",
@@ -25,6 +26,12 @@ export default async function ConfirmPage() {
   const hours = getHoursUntilLock(box.lock_at, simulatedNow);
   const timeMode = getTimeMode(hours);
 
+  const weekLabel = new Date(box.week_start).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-12">
       <SimulationBanner
@@ -33,41 +40,12 @@ export default async function ConfirmPage() {
         timeMode={sim.hoursUntilLock !== null ? timeMode : null}
       />
 
-      <div className="mt-6 text-center">
-        <span className="text-6xl" role="img" aria-label="Celebration">
-          🎉
-        </span>
-        <h1 className="mb-2 mt-4 text-3xl font-semibold tracking-tight">
-          Box Confirmed!
-        </h1>
-        <p className="mb-8 text-base-content/60">
-          Week of{" "}
-          {new Date(box.week_start).toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}
-        </p>
-      </div>
-
-      <ul className="flex flex-col gap-3">
-        {items.map((boxItem) => (
-          <li
-            key={boxItem.id}
-            className="flex items-center gap-4 rounded-lg bg-base-200 p-4"
-          >
-            <span className="text-3xl" role="img" aria-label={boxItem.items.name}>
-              {boxItem.items.emoji}
-            </span>
-            <div>
-              <p className="font-medium">{boxItem.items.name}</p>
-              <span className="badge badge-ghost badge-sm capitalize">
-                {boxItem.items.category}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <ConfirmContent
+        boxId={box.id}
+        items={items}
+        imageUrl={box.image_url}
+        weekLabel={weekLabel}
+      />
 
       {hours > 0 && (
         <Link
@@ -77,11 +55,6 @@ export default async function ConfirmPage() {
           Edit Box
         </Link>
       )}
-
-      {/* AI box image — Phase 5 */}
-      <section className="mt-8 rounded-lg border border-dashed border-base-300 p-6 text-center text-base-content/40">
-        <p>AI-generated box image coming in Phase 5</p>
-      </section>
 
       {/* Recipe teaser — Phase 6 */}
       <section className="mt-4 rounded-lg border border-dashed border-base-300 p-6 text-center text-base-content/40">
