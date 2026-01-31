@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateSimulation } from "@/lib/simulation/actions";
+import { resetAllBoxes } from "@/app/actions/reset";
 import type { UserSlug } from "@/lib/simulation/state";
 import { getTimeMode } from "@/lib/simulation/time";
 
@@ -22,6 +23,7 @@ const SCENARIOS: { label: string; user: UserSlug; hours: number }[] = [
 
 export default function DevPage() {
   const router = useRouter();
+  const [isResetting, startResetTransition] = useTransition();
   const [userSlug, setUserSlug] = useState<UserSlug>("sarah");
   const [hours, setHours] = useState<number | null>(null);
   const [customHours, setCustomHours] = useState("");
@@ -178,6 +180,24 @@ export default function DevPage() {
             <span className="ml-2 text-sm opacity-60">Real time</span>
           )}
         </p>
+      </section>
+
+      {/* Reset */}
+      <section className="mb-8">
+        <h2 className="mb-3 text-lg font-medium">Data</h2>
+        <button
+          type="button"
+          disabled={isResetting}
+          onClick={() => {
+            startResetTransition(async () => {
+              await resetAllBoxes();
+              router.refresh();
+            });
+          }}
+          className="btn btn-outline btn-error min-h-[44px] w-full"
+        >
+          {isResetting ? "Resetting\u2026" : "Reset All Boxes"}
+        </button>
       </section>
 
       {/* Launch */}

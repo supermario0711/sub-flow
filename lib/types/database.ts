@@ -22,7 +22,7 @@ export type Box = {
   user_id: string;
   week_start: string;
   lock_at: string;
-  status: "draft" | "confirmed" | "delivered";
+  status: "draft" | "confirmed" | "delivered" | "skipped";
   confirmed_at: string | null;
   image_url: string | null;
   created_at: string;
@@ -45,6 +45,14 @@ export type SwapHistory = {
   from_item_id: string;
   to_item_id: string;
   swapped_at: string;
+};
+
+export type Vacation = {
+  id: string;
+  user_id: string;
+  start_date: string;
+  end_date: string;
+  created_at: string;
 };
 
 /** BoxItem joined with its related Item data. */

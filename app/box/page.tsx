@@ -1,8 +1,15 @@
-import { getCurrentBox } from "@/lib/services/box";
+import { redirect } from "next/navigation";
+import {
+  getCurrentBox,
+  getAvailableSwapItems,
+  getActiveVacation,
+  getSkippedBox,
+} from "@/lib/services/box";
 import { getSimulation } from "@/lib/simulation/state";
 import { getSimulatedNow } from "@/lib/simulation/clock";
 import { getTimeMode, getHoursUntilLock } from "@/lib/simulation/time";
 import { SimulationBanner } from "@/components/simulation/simulation-banner";
+import { BoxView } from "@/components/box/box-view";
 
 export const metadata = {
   title: "Your Box | Biokiste",
@@ -11,7 +18,52 @@ export const metadata = {
 
 export default async function BoxPage() {
   const sim = await getSimulation();
+  const vacation = await getActiveVacation(sim.userSlug);
+  const skippedBox = await getSkippedBox(sim.userSlug);
   const result = await getCurrentBox(sim.userSlug);
+
+  // If box is skipped, show skipped state
+  if (skippedBox && !result) {
+    const simulatedNow = getSimulatedNow(
+      skippedBox.lock_at,
+      sim.hoursUntilLock
+    );
+    const hours = getHoursUntilLock(skippedBox.lock_at, simulatedNow);
+    const timeMode = getTimeMode(hours);
+
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-12">
+        <SimulationBanner
+          userSlug={sim.userSlug}
+          hoursUntilLock={sim.hoursUntilLock !== null ? hours : null}
+          timeMode={sim.hoursUntilLock !== null ? timeMode : null}
+        />
+
+        <h1 className="mb-2 mt-6 text-3xl font-semibold tracking-tight">
+          Your Box
+        </h1>
+        <p className="mb-8 text-base-content/60">
+          Week of{" "}
+          {new Date(skippedBox.week_start).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </p>
+
+        <BoxView
+          box={skippedBox}
+          items={[]}
+          timeMode={sim.hoursUntilLock !== null ? timeMode : "relaxed"}
+          hoursUntilLock={sim.hoursUntilLock !== null ? hours : 999}
+          availableItems={[]}
+          vacation={vacation}
+          isSkipped
+          userSlug={sim.userSlug}
+        />
+      </main>
+    );
+  }
 
   if (!result) {
     return (
@@ -27,6 +79,13 @@ export default async function BoxPage() {
   const hours = getHoursUntilLock(box.lock_at, simulatedNow);
   const timeMode = getTimeMode(hours);
 
+  // Confirmed + deadline passed → redirect to confirmation page
+  if (box.status === "confirmed" && hours <= 0) {
+    redirect("/confirm");
+  }
+
+  const availableItems = await getAvailableSwapItems(box.id);
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-12">
       <SimulationBanner
@@ -39,32 +98,23 @@ export default async function BoxPage() {
         Your Box
       </h1>
       <p className="mb-8 text-base-content/60">
-        Week of {new Date(box.week_start).toLocaleDateString("en-US", {
+        Week of{" "}
+        {new Date(box.week_start).toLocaleDateString("en-US", {
           month: "long",
           day: "numeric",
           year: "numeric",
         })}
-        {" "}&mdash; {box.status}
       </p>
 
-      <ul className="flex flex-col gap-3">
-        {items.map((boxItem) => (
-          <li
-            key={boxItem.id}
-            className="flex items-center gap-4 rounded-lg bg-base-200 p-4"
-          >
-            <span className="text-3xl" role="img" aria-label={boxItem.items.name}>
-              {boxItem.items.emoji}
-            </span>
-            <div>
-              <p className="font-medium">{boxItem.items.name}</p>
-              <span className="badge badge-ghost badge-sm capitalize">
-                {boxItem.items.category}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <BoxView
+        box={box}
+        items={items}
+        timeMode={sim.hoursUntilLock !== null ? timeMode : "relaxed"}
+        hoursUntilLock={sim.hoursUntilLock !== null ? hours : 999}
+        availableItems={availableItems}
+        vacation={vacation}
+        userSlug={sim.userSlug}
+      />
     </main>
   );
 }
