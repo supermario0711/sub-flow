@@ -266,18 +266,70 @@ We're using the A2UI protocol for adaptive UI generation.
 
 ---
 
-## Phase 3: Core Box UI
+## Phase 2.1: Dev Panel Quick Scenarios Revamp ✅
+
+**Goal:** Adjust dev panel presets to cover all three `TimeLayout` states and expand quick scenarios to a 3×3 persona × time grid
+
+**Status:** Completed 2026-01-31
+
+**Outcomes:**
+- [x] Time presets changed to `0h` (locked), `6h` (urgent), `24h` (browsing)
+- [x] Quick scenarios expanded to 9-button grid (3 personas × 3 time states)
+- [x] Active scenario highlighted in grid
+
+**Exit Criteria:** ~~Dev panel covers all persona × time combinations with one click~~ Met
+
+---
+
+## Phase 3: Core Box UI ✅
 
 **Goal:** The main box management interface with swapping
 
-**Outcomes:**
-- [ ] Box page shows current items
-- [ ] Swap flow works (select item → see options → confirm swap)
-- [ ] Remove item works
-- [ ] Confirm box action locks the box
-- [ ] UI responds to time context (layout/density changes)
+**Status:** Completed 2026-01-31 — All tests passing ([test logs](test-logs/))
 
-**Exit Criteria:** Can swap an item and confirm a box
+**Outcomes:**
+- [x] Box page shows current items with time-adaptive layouts (urgent/browsing/locked)
+- [x] Swap flow works (select item → bottom sheet with options → confirm swap)
+- [x] Remove item works
+- [x] Confirm box action sets status to confirmed, redirects to `/confirm`
+- [x] UI responds to time context (compact single-column urgent, 2-column browsing grid, read-only locked)
+- [x] Confirmation page with celebration view, item summary, and placeholders for Phase 5/6
+- [x] Reset action restores seed data for demo purposes
+
+**Exit Criteria:** ~~Can swap an item and confirm a box~~ Met — Full swap, remove, confirm flows working across all personas and time modes
+
+---
+
+## Phase 3.1: Skip & Vacation ✅
+
+**Goal:** Skip this week&apos;s box (urgent mode) or schedule a vacation pause (browsing mode)
+
+**Status:** Completed 2026-01-31 — All tests passing ([test logs](test-logs/))
+
+**Outcomes:**
+- [x] Skip This Week button in urgent mode with confirmation modal
+- [x] Vacation date-range picker in browsing mode with auto-skip
+- [x] Vacation banner with cancel functionality
+- [x] Skipped state view with reset button
+- [x] Reset action clears vacations and restores boxes
+
+**Exit Criteria:** ~~Can skip a box and schedule a vacation~~ Met — Skip and vacation flows working across all personas and time modes
+
+---
+
+## Phase 3.2: Add Item ✅
+
+**Goal:** Add new items to box via Quick Add suggestions and search modal
+
+**Status:** Completed 2026-01-31 — All tests passing ([test logs](test-logs/))
+
+**Outcomes:**
+- [x] Quick Add chips showing 3 suggested items (Phase 4 stub: random selection)
+- [x] Add Sheet modal with server-side search (debounced, `ilike`)
+- [x] `addItem` server action with position assignment and validation
+- [x] Time-adaptive: urgent shows chips only, browsing shows chips + Add Item button, locked hides all
+
+**Exit Criteria:** ~~Can add items via Quick Add and search~~ Met — Quick Add and Add Sheet working across all time modes
 
 ---
 
