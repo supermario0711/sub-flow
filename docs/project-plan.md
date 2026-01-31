@@ -333,18 +333,22 @@ We're using the A2UI protocol for adaptive UI generation.
 
 ---
 
-## Phase 4: Learning & Suggestions
+## Phase 4: Learning & Suggestions ✅
 
 **Goal:** System detects patterns and shows smart suggestions
 
-**Outcomes:**
-- [ ] Pattern detection from swap history
-- [ ] Suggestion generation based on patterns
-- [ ] Swap suggestion component with accept/dismiss
-- [ ] Suggestions appear in urgent mode when relevant
-- [ ] Accepting suggestion performs the swap
+**Status:** Completed 2026-01-31 — All 62 tests passing ([test logs](test-logs/))
 
-**Exit Criteria:** Mark sees "Swap fennel → zucchini?" suggestion
+**Outcomes:**
+- [x] Pattern detection from swap history (deterministic rule engine, item_dislike + item_preference)
+- [x] Suggestion generation based on patterns (confidence thresholds, category-aware replacements)
+- [x] Swap suggestion component with accept/dismiss (emoji-rich card, loading states, a11y)
+- [x] Suggestions appear in urgent and browsing modes when relevant, hidden in locked mode
+- [x] Accepting suggestion performs the swap with `suggestion_accepted` context
+- [x] Smart Quick Add: preference-aware ordering replaces random selection
+- [x] Pattern weakening on dismiss (confidence × 0.75, deactivates after 3 rejections)
+
+**Exit Criteria:** ~~Mark sees "Swap fennel → zucchini?" suggestion~~ Met — Mark sees suggestion on load, Sarah/Lisa correctly show no suggestions
 
 ---
 

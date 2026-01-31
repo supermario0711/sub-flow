@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { recalculatePatterns } from "@/lib/services/patterns";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -84,6 +85,8 @@ export async function swapItem(
     from_item_id: fromItemId,
     to_item_id: newItemId,
   });
+
+  await recalculatePatterns(box.user_id);
 
   revalidatePath("/box");
   return { success: true };

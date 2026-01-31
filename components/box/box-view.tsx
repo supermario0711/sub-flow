@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { Box, BoxItemWithItem, Item, Vacation } from "@/lib/types/database";
+import type { SwapSuggestion } from "@/lib/types/patterns";
 import type { TimeMode } from "@/lib/simulation/time";
 import { BoxItemCard } from "./box-item-card";
 import { SwapSheet } from "./swap-sheet";
@@ -12,6 +13,7 @@ import { VacationCard } from "./vacation-card";
 import { VacationBanner } from "./vacation-banner";
 import { QuickAdd } from "./quick-add";
 import { AddSheet } from "./add-sheet";
+import { SwapSuggestionCard } from "./swap-suggestion";
 import { swapItem, removeItem } from "@/app/actions/box";
 import { resetAllBoxes } from "@/app/actions/reset";
 
@@ -24,6 +26,7 @@ type BoxViewProps = {
   hoursUntilLock: number;
   availableItems: Pick<Item, "id" | "name" | "emoji" | "category">[];
   suggestedItems?: Pick<Item, "id" | "name" | "emoji" | "category">[];
+  swapSuggestions?: SwapSuggestion[];
   vacation?: Vacation | null;
   isSkipped?: boolean;
   userSlug?: string;
@@ -42,6 +45,7 @@ export function BoxView({
   hoursUntilLock,
   availableItems,
   suggestedItems = [],
+  swapSuggestions = [],
   vacation,
   isSkipped,
   userSlug,
@@ -124,6 +128,18 @@ export function BoxView({
 
       {timeLayout === "urgent" && (
         <UrgentBanner hoursUntilLock={hoursUntilLock} />
+      )}
+
+      {timeLayout !== "locked" && !isSkipped && swapSuggestions.length > 0 && (
+        <div className="mb-4 flex flex-col gap-3">
+          {swapSuggestions.map((suggestion) => (
+            <SwapSuggestionCard
+              key={suggestion.patternId}
+              suggestion={suggestion}
+              boxId={box.id}
+            />
+          ))}
+        </div>
       )}
 
       {items.length === 0 ? (

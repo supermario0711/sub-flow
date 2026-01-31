@@ -44,6 +44,7 @@ export type SwapHistory = {
   user_id: string;
   from_item_id: string;
   to_item_id: string;
+  context: "user_initiated" | "suggestion_accepted" | "suggestion_rejected";
   swapped_at: string;
 };
 

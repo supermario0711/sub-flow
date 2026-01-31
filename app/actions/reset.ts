@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { UserSlug } from "@/lib/simulation/state";
+import { recalculatePatterns } from "@/lib/services/patterns";
 
 type ActionResult = { success: true } | { success: false; error: string };
 
@@ -16,7 +17,7 @@ const SEED_ITEMS: Record<UserSlug, string[]> = {
     "a1000000-0000-0000-0000-000000000009", // Banana
   ],
   mark: [
-    "a1000000-0000-0000-0000-000000000003", // Zucchini
+    "a1000000-0000-0000-0000-000000000002", // Fennel
     "a1000000-0000-0000-0000-000000000004", // Broccoli
     "a1000000-0000-0000-0000-000000000006", // Apple
     "a1000000-0000-0000-0000-000000000008", // Orange
@@ -100,8 +101,9 @@ export async function resetAllBoxes(): Promise<ActionResult> {
 
     if (!box) continue;
 
-    // Delete vacations, swap history, and box items
+    // Delete vacations, swap history, patterns, and box items
     await supabase.from("vacations").delete().eq("user_id", user.id);
+    await supabase.from("patterns").delete().eq("user_id", user.id);
     await supabase.from("swap_history").delete().eq("box_id", box.id);
     await supabase.from("box_items").delete().eq("box_id", box.id);
 
@@ -127,6 +129,9 @@ export async function resetAllBoxes(): Promise<ActionResult> {
       }));
       await supabase.from("swap_history").insert(swapRows);
     }
+
+    // Recalculate patterns from restored swap history
+    await recalculatePatterns(user.id);
 
     // Reset box status
     await supabase

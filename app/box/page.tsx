@@ -5,7 +5,7 @@ import {
   getActiveVacation,
   getSkippedBox,
 } from "@/lib/services/box";
-import { getSuggestedItems } from "@/lib/services/suggestions";
+import { getSuggestedItems, getSwapSuggestions } from "@/lib/services/suggestions";
 import { getSimulation } from "@/lib/simulation/state";
 import { getSimulatedNow } from "@/lib/simulation/clock";
 import { getTimeMode, getHoursUntilLock } from "@/lib/simulation/time";
@@ -85,9 +85,10 @@ export default async function BoxPage() {
     redirect("/confirm");
   }
 
-  const [availableItems, suggestedItems] = await Promise.all([
+  const [availableItems, suggestedItems, swapSuggestions] = await Promise.all([
     getAvailableSwapItems(box.id),
-    getSuggestedItems(box.id),
+    getSuggestedItems(box.id, box.user_id),
+    getSwapSuggestions(box.id, box.user_id),
   ]);
 
   return (
@@ -117,6 +118,7 @@ export default async function BoxPage() {
         hoursUntilLock={sim.hoursUntilLock !== null ? hours : 999}
         availableItems={availableItems}
         suggestedItems={suggestedItems}
+        swapSuggestions={swapSuggestions}
         vacation={vacation}
         userSlug={sim.userSlug}
       />

@@ -47,9 +47,9 @@ INSERT INTO box_items (box_id, item_id, position) VALUES
   ('c1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000007', 4),
   ('c1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000009', 5);
 
--- Mark's box
+-- Mark's box (Fennel at pos 1 — pattern detection will suggest swapping to Zucchini)
 INSERT INTO box_items (box_id, item_id, position) VALUES
-  ('c1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000003', 1),
+  ('c1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000002', 1),
   ('c1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000004', 2),
   ('c1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000006', 3),
   ('c1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000008', 4),
@@ -74,6 +74,17 @@ INSERT INTO swap_history (box_id, user_id, from_item_id, to_item_id, swapped_at)
   ('c1000000-0000-0000-0000-000000000002', 'b1000000-0000-0000-0000-000000000002',
    'a1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000003',
    now() - INTERVAL '7 days');
+
+-- Seed patterns for Mark (pre-calculated from swap history above)
+-- dislike: min(0.95, 0.5 + 3 * 0.15) = 0.95
+-- preference: min(0.90, 0.4 + 3 * 0.15) = 0.85
+INSERT INTO patterns (id, user_id, type, item_id, confidence, occurrences, last_triggered_at, is_active) VALUES
+  ('d1000000-0000-0000-0000-000000000001',
+   'b1000000-0000-0000-0000-000000000002', 'item_dislike',
+   'a1000000-0000-0000-0000-000000000002', 0.95, 3, now() - INTERVAL '7 days', true),
+  ('d1000000-0000-0000-0000-000000000002',
+   'b1000000-0000-0000-0000-000000000002', 'item_preference',
+   'a1000000-0000-0000-0000-000000000003', 0.85, 3, now() - INTERVAL '7 days', true);
 
 -- Swap history: Lisa has varied swaps
 INSERT INTO swap_history (box_id, user_id, from_item_id, to_item_id, swapped_at) VALUES
