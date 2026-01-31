@@ -249,18 +249,20 @@ We're using the A2UI protocol for adaptive UI generation.
 
 ---
 
-## Phase 2: Simulation System
+## Phase 2: Simulation System ✅
 
 **Goal:** Instantly switch between users and time contexts for development and demo
 
-**Outcomes:**
-- [ ] Time context utility (hours → urgent/balanced/relaxed)
-- [ ] User simulation with pre-seeded personas
-- [ ] Dev panel page to control simulation
-- [ ] URL params work as override (`?user=mark&hours=6`)
-- [ ] Simulation state persists during session
+**Status:** Completed 2026-01-31 — All 63 tests passing ([test logs](test-logs/))
 
-**Exit Criteria:** Can switch to "Mark + 6 hours" and see different data
+**Outcomes:**
+- [x] Time context utility (hours → urgent/balanced/relaxed)
+- [x] User simulation with pre-seeded personas
+- [x] Dev panel page to control simulation
+- [x] URL params work as override (`?user=mark&hours=6`)
+- [x] Simulation state persists during session
+
+**Exit Criteria:** ~~Can switch to "Mark + 6 hours" and see different data~~ Met — `/dev` panel switches persona + time, `/box` renders correct box with SimulationBanner
 
 ---
 
