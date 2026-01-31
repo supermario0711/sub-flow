@@ -87,7 +87,7 @@ export default function DevPage() {
               type="button"
               onClick={() => handleSelectPersona(p.slug)}
               className={`btn min-h-[44px] min-w-[44px] flex-1 ${
-                userSlug === p.slug ? "btn-primary" : "btn-ghost"
+                userSlug === p.slug ? "btn-primary" : "btn-outline"
               }`}
             >
               <span className="block font-medium">{p.name}</span>
@@ -107,7 +107,7 @@ export default function DevPage() {
               type="button"
               onClick={() => handleSelectPreset(h)}
               className={`btn min-h-[44px] min-w-[44px] flex-1 ${
-                hours === h ? "btn-primary" : "btn-ghost"
+                hours === h ? "btn-primary" : "btn-outline"
               }`}
             >
               {h}h
@@ -129,12 +129,12 @@ export default function DevPage() {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleCustomHours();
             }}
-            className="input input-bordered min-h-[44px] flex-1"
+            className="input bg-base-100 border border-base-300 min-h-[44px] flex-1"
           />
           <button
             type="button"
             onClick={handleCustomHours}
-            className="btn btn-ghost min-h-[44px] min-w-[44px]"
+            className="btn btn-outline min-h-[44px] min-w-[44px]"
           >
             Set
           </button>
@@ -150,7 +150,7 @@ export default function DevPage() {
               key={s.label}
               type="button"
               onClick={() => handleScenario(s)}
-              className="btn btn-ghost min-h-[44px] justify-start text-left"
+              className="btn btn-soft min-h-[44px] justify-start text-left"
             >
               {s.label}
               <span className="ml-auto text-xs opacity-60">

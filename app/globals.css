@@ -1,5 +1,29 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: soft-garden --default;
+}
+@plugin "daisyui/theme" {
+  name: "soft-garden";
+  default: true;
+  --color-base-100: #FAF9F6;
+  --color-base-200: #E8E4DE;
+  --color-base-300: #D5D0C9;
+  --color-base-content: #2D2D2D;
+  --color-primary: #7D9F85;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #E8E4DE;
+  --color-secondary-content: #2D2D2D;
+  --color-accent: #D4A574;
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #2D2D2D;
+  --color-neutral-content: #FAF9F6;
+  --color-success: #7D9F85;
+  --color-warning: #D4A574;
+  --color-error: #C4756B;
+  --radius-btn: 0.5rem;
+  --radius-box: 0.5rem;
+  --radius-field: 0.5rem;
+}
 
 @theme {
   --color-cream: #FAF9F6;

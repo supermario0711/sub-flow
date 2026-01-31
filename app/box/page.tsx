@@ -16,7 +16,7 @@ export default async function BoxPage() {
   if (!result) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <p className="text-text-muted">No box found for this week.</p>
+        <p className="text-base-content/60">No box found for this week.</p>
       </main>
     );
   }
@@ -38,7 +38,7 @@ export default async function BoxPage() {
       <h1 className="mb-2 mt-6 text-3xl font-semibold tracking-tight">
         Your Box
       </h1>
-      <p className="mb-8 text-text-muted">
+      <p className="mb-8 text-base-content/60">
         Week of {new Date(box.week_start).toLocaleDateString("en-US", {
           month: "long",
           day: "numeric",
@@ -51,7 +51,7 @@ export default async function BoxPage() {
         {items.map((boxItem) => (
           <li
             key={boxItem.id}
-            className="flex items-center gap-4 rounded-lg bg-stone p-4"
+            className="flex items-center gap-4 rounded-lg bg-base-200 p-4"
           >
             <span className="text-3xl" role="img" aria-label={boxItem.items.name}>
               {boxItem.items.emoji}
