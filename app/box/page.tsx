@@ -1,4 +1,8 @@
 import { getCurrentBox } from "@/lib/services/box";
+import { getSimulation } from "@/lib/simulation/state";
+import { getSimulatedNow } from "@/lib/simulation/clock";
+import { getTimeMode, getHoursUntilLock } from "@/lib/simulation/time";
+import { SimulationBanner } from "@/components/simulation/simulation-banner";
 
 export const metadata = {
   title: "Your Box | Biokiste",
@@ -6,7 +10,8 @@ export const metadata = {
 };
 
 export default async function BoxPage() {
-  const result = await getCurrentBox("sarah");
+  const sim = await getSimulation();
+  const result = await getCurrentBox(sim.userSlug);
 
   if (!result) {
     return (
@@ -18,9 +23,19 @@ export default async function BoxPage() {
 
   const { box, items } = result;
 
+  const simulatedNow = getSimulatedNow(box.lock_at, sim.hoursUntilLock);
+  const hours = getHoursUntilLock(box.lock_at, simulatedNow);
+  const timeMode = getTimeMode(hours);
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-12">
-      <h1 className="mb-2 text-3xl font-semibold tracking-tight">
+      <SimulationBanner
+        userSlug={sim.userSlug}
+        hoursUntilLock={sim.hoursUntilLock !== null ? hours : null}
+        timeMode={sim.hoursUntilLock !== null ? timeMode : null}
+      />
+
+      <h1 className="mb-2 mt-6 text-3xl font-semibold tracking-tight">
         Your Box
       </h1>
       <p className="mb-8 text-text-muted">
