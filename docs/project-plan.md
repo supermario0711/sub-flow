@@ -270,7 +270,7 @@ We're using the A2UI protocol for adaptive UI generation.
 
 **Goal:** Adjust dev panel presets to cover all three `TimeLayout` states and expand quick scenarios to a 3×3 persona × time grid
 
-**Status:** Completed 2026-01-31
+**Status:** Completed 2026-01-31 — All tests passing ([test logs](test-logs/))
 
 **Outcomes:**
 - [x] Time presets changed to `0h` (locked), `6h` (urgent), `24h` (browsing)

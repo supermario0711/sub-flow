@@ -13,12 +13,18 @@ const PERSONAS: { slug: UserSlug; name: string; persona: string }[] = [
   { slug: "lisa", name: "Lisa", persona: "Power user" },
 ];
 
-const TIME_PRESETS = [6, 24, 96] as const;
+const TIME_PRESETS = [0, 6, 24] as const;
 
 const SCENARIOS: { label: string; user: UserSlug; hours: number }[] = [
-  { label: "Urgent new user", user: "sarah", hours: 4 },
-  { label: "Relaxed power user", user: "lisa", hours: 120 },
-  { label: "Balanced experienced", user: "mark", hours: 36 },
+  { label: "Sarah · Locked", user: "sarah", hours: 0 },
+  { label: "Sarah · Urgent", user: "sarah", hours: 6 },
+  { label: "Sarah · Browsing", user: "sarah", hours: 24 },
+  { label: "Mark · Locked", user: "mark", hours: 0 },
+  { label: "Mark · Urgent", user: "mark", hours: 6 },
+  { label: "Mark · Browsing", user: "mark", hours: 24 },
+  { label: "Lisa · Locked", user: "lisa", hours: 0 },
+  { label: "Lisa · Urgent", user: "lisa", hours: 6 },
+  { label: "Lisa · Browsing", user: "lisa", hours: 24 },
 ];
 
 export default function DevPage() {
@@ -146,18 +152,19 @@ export default function DevPage() {
       {/* Quick scenarios */}
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-medium">Quick scenarios</h2>
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {SCENARIOS.map((s) => (
             <button
               key={s.label}
               type="button"
               onClick={() => handleScenario(s)}
-              className="btn btn-soft min-h-[44px] justify-start text-left"
+              className={`btn btn-soft min-h-[44px] ${
+                userSlug === s.user && hours === s.hours
+                  ? "btn-primary"
+                  : ""
+              }`}
             >
               {s.label}
-              <span className="ml-auto text-xs opacity-60">
-                {s.user} &middot; {s.hours}h
-              </span>
             </button>
           ))}
         </div>
