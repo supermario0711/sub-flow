@@ -5,6 +5,11 @@ import { revalidatePath } from "next/cache";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** Escape SQL LIKE/ILIKE wildcards so user input is treated as literals. */
+function escapeLike(str: string): string {
+  return str.replace(/[%_\\]/g, "\\$&");
+}
+
 function isValidUuid(value: string): boolean {
   return UUID_RE.test(value);
 }
@@ -103,7 +108,7 @@ export async function searchItems(
   let itemQuery = supabase
     .from("items")
     .select("id, name, emoji, category")
-    .ilike("name", `%${trimmed}%`)
+    .ilike("name", `%${escapeLike(trimmed)}%`)
     .order("name")
     .limit(20);
 
