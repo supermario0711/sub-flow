@@ -12,8 +12,8 @@ export type SimulationState = {
 const COOKIE_NAME = "sim";
 
 const DEFAULT_STATE: SimulationState = {
-  userSlug: "sarah",
-  hoursUntilLock: null,
+  userSlug: "mark",
+  hoursUntilLock: 24,
 };
 
 /**

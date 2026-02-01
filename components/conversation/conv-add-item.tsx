@@ -7,13 +7,14 @@ type ConvAddItemProps = {
   prompt: string;
   boxId: string;
   disabled?: boolean;
+  onItemAdded?: (itemName: string) => void;
 };
 
 /**
  * Conversation wrapper for AddSheet.
  * Shows a button with the prompt text; clicking opens the full search sheet.
  */
-export function ConvAddItem({ prompt, boxId, disabled = false }: ConvAddItemProps) {
+export function ConvAddItem({ prompt, boxId, disabled = false, onItemAdded }: ConvAddItemProps) {
   const [showSheet, setShowSheet] = useState(false);
 
   return (
@@ -29,7 +30,7 @@ export function ConvAddItem({ prompt, boxId, disabled = false }: ConvAddItemProp
         {prompt}
       </button>
       {showSheet && (
-        <AddSheet boxId={boxId} onClose={() => setShowSheet(false)} />
+        <AddSheet boxId={boxId} onClose={() => setShowSheet(false)} onItemAdded={onItemAdded} />
       )}
     </div>
   );

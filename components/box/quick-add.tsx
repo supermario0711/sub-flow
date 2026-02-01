@@ -9,17 +9,20 @@ type QuickAddProps = {
   boxId: string;
   suggestions: Pick<Item, "id" | "name" | "emoji" | "category">[];
   onOpenSheet: () => void;
+  onItemAdded?: (itemName: string) => void;
 };
 
-export function QuickAdd({ boxId, suggestions, onOpenSheet }: QuickAddProps) {
+export function QuickAdd({ boxId, suggestions, onOpenSheet, onItemAdded }: QuickAddProps) {
   const [isPending, startTransition] = useTransition();
   const prefersReducedMotion = useReducedMotion();
 
-  const handleAdd = (itemId: string) => {
+  const handleAdd = (item: Pick<Item, "id" | "name">) => {
     startTransition(async () => {
-      const result = await addItem(boxId, itemId);
+      const result = await addItem(boxId, item.id);
       if (!result.success) {
         alert(result.error);
+      } else {
+        onItemAdded?.(item.name);
       }
     });
   };
@@ -31,7 +34,7 @@ export function QuickAdd({ boxId, suggestions, onOpenSheet }: QuickAddProps) {
           key={item.id}
           type="button"
           disabled={isPending}
-          onClick={() => handleAdd(item.id)}
+          onClick={() => handleAdd(item)}
           aria-label={`Add ${item.name} to box`}
           initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}

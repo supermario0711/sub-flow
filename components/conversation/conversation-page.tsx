@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import type {
   ConversationTurn,
   ConversationContext,
@@ -83,6 +83,10 @@ export function ConversationPage({
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // handleItemAdded is defined later via useCallback — use a ref to avoid
+  // circular dependency with turnRendererCtx → handleItemAdded → handleUserResponse → turns
+  const handleItemAddedRef = useRef<(itemName: string) => void>(() => {});
+
   const turnRendererCtx = useMemo<TurnRendererContext>(
     () => ({
       boxId,
@@ -90,6 +94,7 @@ export function ConversationPage({
       vacation,
       availableItemsFull,
       itemDetails,
+      onItemAdded: (itemName: string) => handleItemAddedRef.current(itemName),
     }),
     [boxId, userSlug, vacation, availableItemsFull, itemDetails]
   );
@@ -225,6 +230,21 @@ export function ConversationPage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [loading, turns, fetchNextTurn, executeSideEffects, processTurn]
   );
+
+  const handleItemAdded = useCallback(
+    (itemName: string) => {
+      const response: UserResponse = {
+        turnId: turns.length > 0 ? turns[turns.length - 1].id : "init",
+        componentType: "quick-add",
+        action: "item-added",
+        payload: { itemName },
+        timestamp: Date.now(),
+      };
+      void handleUserResponse(response);
+    },
+    [turns, handleUserResponse]
+  );
+  handleItemAddedRef.current = handleItemAdded;
 
   const handleTextSubmit = useCallback(
     (text: string) => {

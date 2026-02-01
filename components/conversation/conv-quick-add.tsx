@@ -11,6 +11,7 @@ type ConvQuickAddProps = {
   boxId: string;
   availableItems: AvailableItem[];
   disabled?: boolean;
+  onItemAdded?: (itemName: string) => void;
 };
 
 /**
@@ -22,6 +23,7 @@ export function ConvQuickAdd({
   boxId,
   availableItems,
   disabled = false,
+  onItemAdded,
 }: ConvQuickAddProps) {
   const [showSheet, setShowSheet] = useState(false);
 
@@ -38,9 +40,10 @@ export function ConvQuickAdd({
         boxId={boxId}
         suggestions={resolved}
         onOpenSheet={() => setShowSheet(true)}
+        onItemAdded={onItemAdded}
       />
       {showSheet && (
-        <AddSheet boxId={boxId} onClose={() => setShowSheet(false)} />
+        <AddSheet boxId={boxId} onClose={() => setShowSheet(false)} onItemAdded={onItemAdded} />
       )}
     </div>
   );

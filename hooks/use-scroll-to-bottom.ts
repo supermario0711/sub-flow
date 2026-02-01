@@ -6,6 +6,7 @@ const THRESHOLD = 100;
 
 export function useScrollToBottom(containerRef: React.RefObject<HTMLElement | null>) {
   const [isAtBottom, setIsAtBottom] = useState(true);
+  const isAtBottomRef = useRef(true);
   const isUserScrolling = useRef(false);
   const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -14,6 +15,7 @@ export function useScrollToBottom(containerRef: React.RefObject<HTMLElement | nu
     if (!el) return;
     const atBottom =
       el.scrollHeight - el.scrollTop - el.clientHeight < THRESHOLD;
+    isAtBottomRef.current = atBottom;
     setIsAtBottom(atBottom);
   }, [containerRef]);
 
@@ -49,7 +51,7 @@ export function useScrollToBottom(containerRef: React.RefObject<HTMLElement | nu
     if (!el) return;
 
     const autoScroll = () => {
-      if (isAtBottom && !isUserScrolling.current) {
+      if (isAtBottomRef.current && !isUserScrolling.current) {
         scrollToBottom("instant" as ScrollBehavior);
       }
     };
@@ -64,7 +66,7 @@ export function useScrollToBottom(containerRef: React.RefObject<HTMLElement | nu
       mutationObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, [containerRef, isAtBottom, scrollToBottom]);
+  }, [containerRef, scrollToBottom]);
 
   return { isAtBottom, scrollToBottom };
 }

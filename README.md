@@ -68,6 +68,25 @@ The prototype simulates weekly vegetable box subscriptions with three personas:
 | Regular | Mark  | 3 weeks in, has clear preferences | Fennel, Broccoli, Apple, Orange, Strawberry | Swapped Fennel &rarr; Zucchini 3 times; system detects dislike of Fennel (95%) and preference for Zucchini (85%) |
 | Power   | Lisa  | Engaged power user, curious and exploratory | Carrot, Fennel, Beetroot, Pear, Strawberry | Swapped to Strawberry 2x, Orange 2x, Broccoli away 2x; prefers Strawberry (70%), prefers Orange (70%), dislikes Broccoli (80%) |
 
+### Things to Try
+
+**Scenario 1: Watch a box go through its lifecycle**
+1. Select **Sarah** with **Plenty of time** — explore the relaxed browse mode
+2. Switch to **Locking soon** — see the UI shift to urgency mode
+3. Switch to **Locked** — the box is finalized, no more changes
+
+**Scenario 2: Compare "locking soon" across personas**
+1. Switch to **Lisa** with **Plenty of time** and **reset boxes** — see how a power user&apos;s experience differs with learned preferences
+2. Select **Mark** with **Locking soon** — notice his Fennel &rarr; Zucchini suggestion (strong pattern)
+3. Switch to **Lisa** with **Locking soon** — compare her different preference suggestions (fruit-focused)
+
+**Scenario 3: Conversation interactions**
+Try these via the chat interface:
+- Add a vacation (pause deliveries)
+- Skip this week
+- Add or remove items from the box
+- Confirm a box, keep editing a box
+
 ### Architecture
 
 See `docs/project-plan.md` for the full product vision and `docs/phases/` for implementation details across 8 phases.

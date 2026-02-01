@@ -8,9 +8,10 @@ import { addItem } from "@/app/actions/add-item";
 type AddSheetProps = {
   boxId: string;
   onClose: () => void;
+  onItemAdded?: (itemName: string) => void;
 };
 
-export function AddSheet({ boxId, onClose }: AddSheetProps) {
+export function AddSheet({ boxId, onClose, onItemAdded }: AddSheetProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState<
@@ -62,12 +63,13 @@ export function AddSheet({ boxId, onClose }: AddSheetProps) {
     [onClose]
   );
 
-  const handleSelect = (itemId: string) => {
+  const handleSelect = (itemId: string, itemName: string) => {
     startTransition(async () => {
       const result = await addItem(boxId, itemId);
       if (!result.success) {
         alert(result.error);
       } else {
+        onItemAdded?.(itemName);
         onClose();
       }
     });
@@ -112,7 +114,7 @@ export function AddSheet({ boxId, onClose }: AddSheetProps) {
                 <button
                   type="button"
                   disabled={isPending}
-                  onClick={() => handleSelect(item.id)}
+                  onClick={() => handleSelect(item.id, item.name)}
                   className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-all duration-300 hover:bg-base-200 focus:ring-2 focus:ring-primary focus:ring-offset-2 motion-reduce:transition-none min-h-[44px]"
                 >
                   <span className="text-2xl" role="img" aria-label={item.name}>

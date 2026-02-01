@@ -25,6 +25,7 @@ export type TurnRendererContext = {
   vacation?: Vacation | null;
   availableItemsFull: Array<{ id: string; name: string; emoji: string; category: "vegetable" | "fruit" }>;
   itemDetails?: Record<string, { emoji: string; category: string }>;
+  onItemAdded?: (itemName: string) => void;
 };
 
 type TurnRendererProps = {
@@ -173,6 +174,7 @@ export function TurnRenderer({ turn, isActive, onResponse, ctx }: TurnRendererPr
                 boxId={ctx.boxId}
                 availableItems={ctx.availableItemsFull}
                 disabled={disabled}
+                onItemAdded={ctx.onItemAdded}
               />
             );
 
@@ -183,6 +185,7 @@ export function TurnRenderer({ turn, isActive, onResponse, ctx }: TurnRendererPr
                 prompt={component.props.prompt}
                 boxId={ctx.boxId}
                 disabled={disabled}
+                onItemAdded={ctx.onItemAdded}
               />
             );
 
