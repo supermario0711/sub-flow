@@ -222,6 +222,27 @@ export async function removeItem(
 }
 
 /**
+ * Reverts a confirmed box back to draft without redirecting — used by in-chat edit flow.
+ */
+export async function editBoxInChat(boxId: string): Promise<ActionResult> {
+  if (!isValidUuid(boxId)) {
+    return { success: false, error: "Invalid request." };
+  }
+
+  const supabase = await createClient();
+
+  await supabase
+    .from("boxes")
+    .update({ status: "draft", image_url: null, updated_at: new Date().toISOString() })
+    .eq("id", boxId)
+    .eq("status", "confirmed");
+
+  revalidatePath("/box");
+  revalidatePath("/confirm");
+  return { success: true };
+}
+
+/**
  * Reverts a confirmed box back to draft so the user can edit it.
  */
 export async function editBox(boxId: string): Promise<never> {
@@ -240,6 +261,48 @@ export async function editBox(boxId: string): Promise<never> {
   revalidatePath("/box");
   revalidatePath("/confirm");
   redirect("/box");
+}
+
+/**
+ * Confirms a draft box without redirecting — used by the in-chat confirm flow.
+ */
+export async function confirmBoxInChat(boxId: string): Promise<ActionResult> {
+  if (!isValidUuid(boxId)) {
+    return { success: false, error: "Invalid request." };
+  }
+
+  const supabase = await createClient();
+
+  const { data: box, error: boxError } = await supabase
+    .from("boxes")
+    .select("id, status")
+    .eq("id", boxId)
+    .single();
+
+  if (boxError || !box) {
+    return { success: false, error: "Box not found." };
+  }
+
+  if (box.status !== "draft" && box.status !== "confirmed") {
+    return { success: false, error: "This box can no longer be confirmed." };
+  }
+
+  const { error: updateError } = await supabase
+    .from("boxes")
+    .update({
+      status: "confirmed",
+      confirmed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      image_url: null,
+    })
+    .eq("id", boxId);
+
+  if (updateError) {
+    return { success: false, error: "Failed to confirm box. Please try again." };
+  }
+
+  revalidatePath("/box");
+  return { success: true };
 }
 
 /**
@@ -272,6 +335,7 @@ export async function confirmBox(boxId: string): Promise<ActionResult> {
       status: "confirmed",
       confirmed_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      image_url: null,
     })
     .eq("id", boxId);
 

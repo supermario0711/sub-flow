@@ -6,9 +6,10 @@ import type { Vacation } from "@/lib/types/database";
 
 type VacationBannerProps = {
   vacation: Vacation;
+  onCancel?: () => void;
 };
 
-export function VacationBanner({ vacation }: VacationBannerProps) {
+export function VacationBanner({ vacation, onCancel }: VacationBannerProps) {
   const [isPending, startTransition] = useTransition();
 
   const endFormatted = new Date(vacation.end_date).toLocaleDateString("en-US", {
@@ -22,6 +23,8 @@ export function VacationBanner({ vacation }: VacationBannerProps) {
       const result = await cancelVacation(vacation.id);
       if (!result.success) {
         alert(result.error);
+      } else {
+        onCancel?.();
       }
     });
   };

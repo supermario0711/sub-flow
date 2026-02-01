@@ -13,18 +13,18 @@ const PERSONAS: { slug: UserSlug; name: string; persona: string }[] = [
   { slug: "lisa", name: "Lisa", persona: "Power user" },
 ];
 
-const TIME_PRESETS = [0, 6, 24] as const;
+const TIME_PRESETS = [0, 6, 24, 48, 96] as const;
 
 const SCENARIOS: { label: string; user: UserSlug; hours: number }[] = [
-  { label: "Sarah · Locked", user: "sarah", hours: 0 },
-  { label: "Sarah · Urgent", user: "sarah", hours: 6 },
-  { label: "Sarah · Browsing", user: "sarah", hours: 24 },
-  { label: "Mark · Locked", user: "mark", hours: 0 },
-  { label: "Mark · Urgent", user: "mark", hours: 6 },
-  { label: "Mark · Browsing", user: "mark", hours: 24 },
-  { label: "Lisa · Locked", user: "lisa", hours: 0 },
-  { label: "Lisa · Urgent", user: "lisa", hours: 6 },
-  { label: "Lisa · Browsing", user: "lisa", hours: 24 },
+  { label: "Sarah \u00b7 Locked", user: "sarah", hours: 0 },
+  { label: "Sarah \u00b7 Urgent", user: "sarah", hours: 6 },
+  { label: "Sarah \u00b7 Browsing", user: "sarah", hours: 24 },
+  { label: "Mark \u00b7 Locked", user: "mark", hours: 0 },
+  { label: "Mark \u00b7 Urgent", user: "mark", hours: 6 },
+  { label: "Mark \u00b7 Browsing", user: "mark", hours: 24 },
+  { label: "Lisa \u00b7 Locked", user: "lisa", hours: 0 },
+  { label: "Lisa \u00b7 Urgent", user: "lisa", hours: 6 },
+  { label: "Lisa \u00b7 Browsing", user: "lisa", hours: 24 },
 ];
 
 export default function DevPage() {
@@ -33,6 +33,8 @@ export default function DevPage() {
   const [userSlug, setUserSlug] = useState<UserSlug>("sarah");
   const [hours, setHours] = useState<number | null>(null);
   const [customHours, setCustomHours] = useState("");
+  const [forceFallback, setForceFallback] = useState(false);
+  const [convDebugOpen, setConvDebugOpen] = useState(false);
 
   const apply = useCallback(
     async (slug: UserSlug, h: number | null) => {
@@ -189,6 +191,50 @@ export default function DevPage() {
         </p>
       </section>
 
+      {/* Conversation Debug */}
+      <section className="mb-8">
+        <button
+          type="button"
+          onClick={() => setConvDebugOpen(!convDebugOpen)}
+          className="btn btn-ghost min-h-[44px] w-full justify-between"
+        >
+          <span className="text-lg font-medium">Conversation Debug</span>
+          <span>{convDebugOpen ? "\u25B2" : "\u25BC"}</span>
+        </button>
+
+        {convDebugOpen && (
+          <div className="mt-3 flex flex-col gap-3 rounded-lg border border-base-300 bg-base-200 p-4">
+            {/* Force Fallback toggle */}
+            <div className="flex items-center justify-between">
+              <label htmlFor="force-fallback" className="text-sm font-medium">
+                Force Fallback (skip Gemini)
+              </label>
+              <input
+                id="force-fallback"
+                type="checkbox"
+                className="toggle toggle-primary"
+                checked={forceFallback}
+                onChange={(e) => setForceFallback(e.target.checked)}
+              />
+            </div>
+
+            {/* Reset Conversation */}
+            <button
+              type="button"
+              onClick={() => router.push("/box")}
+              className="btn btn-outline min-h-[44px] w-full"
+            >
+              Reset Conversation (reload /box)
+            </button>
+
+            <p className="text-xs text-base-content/50">
+              Conversation history is ephemeral and lives in client state.
+              Reloading the page resets it.
+            </p>
+          </div>
+        )}
+      </section>
+
       {/* Reset */}
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-medium">Data</h2>
@@ -210,7 +256,10 @@ export default function DevPage() {
       {/* Launch */}
       <button
         type="button"
-        onClick={() => router.push("/box")}
+        onClick={() => {
+          const params = forceFallback ? "?fallback=1" : "";
+          router.push(`/box${params}`);
+        }}
         className="btn btn-primary btn-lg min-h-[44px] w-full"
       >
         Launch Box View

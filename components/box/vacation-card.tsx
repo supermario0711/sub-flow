@@ -5,6 +5,7 @@ import { addVacation } from "@/app/actions/vacation";
 
 type VacationCardProps = {
   userSlug: string;
+  onSuccess?: () => void;
 };
 
 /**
@@ -48,7 +49,7 @@ function countWeeks(startDate: string, endDate: string): number {
   return count;
 }
 
-export function VacationCard({ userSlug }: VacationCardProps) {
+export function VacationCard({ userSlug, onSuccess }: VacationCardProps) {
   const defaultStart = useMemo(() => getNextMonday(), []);
   const defaultEnd = useMemo(() => addDays(defaultStart, 7), [defaultStart]);
 
@@ -67,6 +68,8 @@ export function VacationCard({ userSlug }: VacationCardProps) {
       const result = await addVacation(userSlug, startDate, endDate);
       if (!result.success) {
         setError(result.error);
+      } else {
+        onSuccess?.();
       }
     });
   };

@@ -62,11 +62,11 @@ An adaptive subscription interface that:
 
 The prototype simulates weekly vegetable box subscriptions with three personas:
 
-| Persona | Name  | Story                        |
-|---------|-------|------------------------------|
-| New     | Sarah | Just signed up, exploring    |
-| Regular | Mark  | 3 weeks in, hates fennel     |
-| Power   | Lisa  | Engaged, vegetarian, curious |
+| Persona | Name  | Story | Default Box | Swap History & Patterns |
+|---------|-------|-------|-------------|------------------------|
+| New     | Sarah | Just signed up, exploring the service for the first time | Carrot, Broccoli, Apple, Pear, Banana | None — clean slate, no learned patterns |
+| Regular | Mark  | 3 weeks in, has clear preferences | Fennel, Broccoli, Apple, Orange, Strawberry | Swapped Fennel &rarr; Zucchini 3 times; system detects dislike of Fennel (95%) and preference for Zucchini (85%) |
+| Power   | Lisa  | Engaged power user, curious and exploratory | Carrot, Fennel, Beetroot, Pear, Strawberry | Swapped to Strawberry 2x, Orange 2x, Broccoli away 2x; prefers Strawberry (70%), prefers Orange (70%), dislikes Broccoli (80%) |
 
 ### Architecture
 

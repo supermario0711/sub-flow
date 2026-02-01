@@ -5,13 +5,14 @@ import {
   getActiveVacation,
   getSkippedBox,
 } from "@/lib/services/box";
-import { getSuggestedItems, getSwapSuggestions } from "@/lib/services/suggestions";
 import { getSimulation } from "@/lib/simulation/state";
 import { getSimulatedNow } from "@/lib/simulation/clock";
 import { getTimeMode, getHoursUntilLock } from "@/lib/simulation/time";
 import { autoConfirmBox } from "@/app/actions/box";
 import { SimulationBanner } from "@/components/simulation/simulation-banner";
 import { BoxView } from "@/components/box/box-view";
+import { buildConversationContext } from "@/lib/conversation/context";
+import { ConversationPage } from "@/components/conversation/conversation-page";
 
 export const metadata = {
   title: "Your Box | Biokiste",
@@ -24,7 +25,7 @@ export default async function BoxPage() {
   const skippedBox = await getSkippedBox(sim.userSlug);
   const result = await getCurrentBox(sim.userSlug);
 
-  // If box is skipped, show skipped state
+  // If box is skipped, show skipped state (keep original BoxView)
   if (skippedBox && !result) {
     const simulatedNow = getSimulatedNow(
       skippedBox.lock_at,
@@ -89,11 +90,38 @@ export default async function BoxPage() {
     redirect("/confirm");
   }
 
-  const [availableItems, suggestedItems, swapSuggestions] = await Promise.all([
-    getAvailableSwapItems(box.id),
-    getSuggestedItems(box.id, box.user_id),
-    getSwapSuggestions(box.id, box.user_id),
-  ]);
+  // Build conversation context and item maps for the ConversationPage
+  const context = await buildConversationContext(
+    box.id,
+    box.user_id,
+    sim.userSlug
+  );
+
+  // Build item ID map: item name → { boxItemId, itemId }
+  const itemIdMap: Record<string, { boxItemId: string; itemId: string }> = {};
+  for (const item of items) {
+    itemIdMap[item.items.name] = {
+      boxItemId: item.id,
+      itemId: item.items.id,
+    };
+  }
+
+  // Build available items (full objects for quick-add + name→id map for side effects)
+  const availableItems = await getAvailableSwapItems(box.id);
+  const availableItemMap: Record<string, string> = {};
+  const availableItemsFull = availableItems.map((item) => {
+    availableItemMap[item.name] = item.id;
+    return { id: item.id, name: item.name, emoji: item.emoji, category: item.category };
+  });
+
+  // Build item details map: item name → { emoji, category }
+  const itemDetails: Record<string, { emoji: string; category: string }> = {};
+  for (const item of items) {
+    itemDetails[item.items.name] = {
+      emoji: item.items.emoji,
+      category: item.items.category,
+    };
+  }
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-12">
@@ -115,16 +143,15 @@ export default async function BoxPage() {
         })}
       </p>
 
-      <BoxView
-        box={box}
-        items={items}
-        timeMode={sim.hoursUntilLock !== null ? timeMode : "relaxed"}
-        hoursUntilLock={sim.hoursUntilLock !== null ? hours : 999}
-        availableItems={availableItems}
-        suggestedItems={suggestedItems}
-        swapSuggestions={swapSuggestions}
-        vacation={vacation}
+      <ConversationPage
+        context={context}
+        boxId={box.id}
         userSlug={sim.userSlug}
+        vacation={vacation}
+        itemIdMap={itemIdMap}
+        availableItemMap={availableItemMap}
+        availableItemsFull={availableItemsFull}
+        itemDetails={itemDetails}
       />
     </main>
   );

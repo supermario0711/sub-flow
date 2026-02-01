@@ -29,6 +29,12 @@ Implementation is split into 8 phases. Each phase gets its own file at `docs/pha
 7. **A2UI Integration** — Custom React renderer, Vertex AI UI generation
 8. **Demo Polish** — End-to-end demo flow, error handling, performance
 
+### Demo Personas (seeded in `supabase/seed.sql`)
+
+- **Sarah** (`new`) — Brand new subscriber. Default box: Carrot, Broccoli, Apple, Pear, Banana. No swap history or learned patterns. Represents the onboarding experience.
+- **Mark** (`experienced`) — 3 weeks in. Default box: Fennel, Broccoli, Apple, Orange, Strawberry. Has swapped Fennel to Zucchini 3 times, triggering pattern detection: dislikes Fennel (95% confidence), prefers Zucchini (85% confidence). Demonstrates smart suggestions.
+- **Lisa** (`power`) — Engaged power user. Default box: Carrot, Fennel, Beetroot, Pear, Strawberry. Swap history shows fruit preferences: swapped to Strawberry 2x and Orange 2x, plus Broccoli swapped away 2x. Patterns: prefers Strawberry (70%), prefers Orange (70%), dislikes Broccoli (80%). Demonstrates quick-add fruit pills and swap suggestions.
+
 Key references:
 - `docs/project-plan.md` — Product vision, personas, flows, success criteria
 - `docs/a2ui-renderer.md` — A2UI protocol spec and renderer architecture

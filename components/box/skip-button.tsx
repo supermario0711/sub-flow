@@ -5,9 +5,10 @@ import { skipWeek } from "@/app/actions/vacation";
 
 type SkipButtonProps = {
   boxId: string;
+  onSkipped?: () => void;
 };
 
-export function SkipButton({ boxId }: SkipButtonProps) {
+export function SkipButton({ boxId, onSkipped }: SkipButtonProps) {
   const [isPending, startTransition] = useTransition();
   const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -21,6 +22,8 @@ export function SkipButton({ boxId }: SkipButtonProps) {
       const result = await skipWeek(boxId);
       if (!result.success) {
         alert(result.error);
+      } else {
+        onSkipped?.();
       }
     });
   };
@@ -37,26 +40,26 @@ export function SkipButton({ boxId }: SkipButtonProps) {
         {isPending ? "Skipping\u2026" : "Skip This Week"}
       </button>
 
-      <dialog ref={modalRef} className="modal" aria-label="Skip confirmation">
+      <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle" aria-label="Skip confirmation">
         <div className="modal-box">
           <h3 className="text-lg font-bold">Skip this week&apos;s box?</h3>
           <p className="py-4">
             You won&apos;t receive a delivery this week. You can undo this
             by resetting your box.
           </p>
-          <div className="modal-action">
-            <form method="dialog">
-              <button type="submit" className="btn btn-ghost min-h-[44px]">
-                Cancel
-              </button>
-            </form>
+          <div className="modal-action flex-col sm:flex-row gap-2">
             <button
               type="button"
               onClick={handleConfirm}
-              className="btn btn-error min-h-[44px]"
+              className="btn btn-error w-full sm:w-auto min-h-[44px]"
             >
               Skip
             </button>
+            <form method="dialog" className="w-full sm:w-auto">
+              <button type="submit" className="btn btn-ghost w-full sm:w-auto min-h-[44px]">
+                Cancel
+              </button>
+            </form>
           </div>
         </div>
         <form method="dialog" className="modal-backdrop">

@@ -86,11 +86,39 @@ INSERT INTO patterns (id, user_id, type, item_id, confidence, occurrences, last_
    'b1000000-0000-0000-0000-000000000002', 'item_preference',
    'a1000000-0000-0000-0000-000000000003', 0.85, 3, now() - INTERVAL '7 days', true);
 
--- Swap history: Lisa has varied swaps
+-- Swap history: Lisa swaps vegetables for fruits — builds fruit preferences
 INSERT INTO swap_history (box_id, user_id, from_item_id, to_item_id, swapped_at) VALUES
+  -- Broccoli → Orange (2 weeks ago)
   ('c1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000003',
-   'a1000000-0000-0000-0000-000000000004', 'a1000000-0000-0000-0000-000000000005',
+   'a1000000-0000-0000-0000-000000000004', 'a1000000-0000-0000-0000-000000000008',
    now() - INTERVAL '14 days'),
+  -- Banana → Strawberry (kept from original)
   ('c1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000003',
    'a1000000-0000-0000-0000-000000000009', 'a1000000-0000-0000-0000-000000000010',
-   now() - INTERVAL '7 days');
+   now() - INTERVAL '10 days'),
+  -- Fennel → Apple (1 week ago)
+  ('c1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000003',
+   'a1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000006',
+   now() - INTERVAL '7 days'),
+  -- Carrot → Strawberry (5 days ago — gives Strawberry 2 occurrences)
+  ('c1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000003',
+   'a1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000010',
+   now() - INTERVAL '5 days'),
+  -- Broccoli → Orange (3 days ago — gives Orange 2 occurrences)
+  ('c1000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000003',
+   'a1000000-0000-0000-0000-000000000004', 'a1000000-0000-0000-0000-000000000008',
+   now() - INTERVAL '3 days');
+
+-- Seed patterns for Lisa (pre-calculated from swap history above)
+-- item_preference: min(0.90, 0.4 + 2 * 0.15) = 0.70
+-- item_dislike for Broccoli: min(0.95, 0.5 + 2 * 0.15) = 0.80
+INSERT INTO patterns (id, user_id, type, item_id, confidence, occurrences, last_triggered_at, is_active) VALUES
+  ('d1000000-0000-0000-0000-000000000003',
+   'b1000000-0000-0000-0000-000000000003', 'item_preference',
+   'a1000000-0000-0000-0000-000000000010', 0.70, 2, now() - INTERVAL '5 days', true),
+  ('d1000000-0000-0000-0000-000000000004',
+   'b1000000-0000-0000-0000-000000000003', 'item_preference',
+   'a1000000-0000-0000-0000-000000000008', 0.70, 2, now() - INTERVAL '3 days', true),
+  ('d1000000-0000-0000-0000-000000000005',
+   'b1000000-0000-0000-0000-000000000003', 'item_dislike',
+   'a1000000-0000-0000-0000-000000000004', 0.80, 2, now() - INTERVAL '3 days', true);
