@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cursor 2-Day AI Hackathon — Repo Template
 
-## Getting Started
+![Cursor 2-Day AI Hackathon](https://ai-beavers.com/_next/image?url=%2Fimages%2Fhackathon-hero-20012026.png&w=1920&q=75)
 
-First, run the development server:
+---
+
+# Sub-Flow (Biokiste)
+
+> An adaptive subscription management UI that feels like texting a friend, not navigating a webshop.
+
+## Tech Stack
+
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript 5
+- **Styling**: Tailwind CSS v4, DaisyUI 5
+- **Database**: Supabase (PostgreSQL)
+- **AI/ML**: Gemini 2.5 Flash (image generation), Vertex AI (A2UI generation)
+- **Hosting**: Vercel
+
+## How to Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Clone the repo
+git clone https://github.com/your-team/sub-flow.git
+cd sub-flow
+
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp .env.example .env
+# Add your Supabase and Google AI API keys to .env
+
+# Run the development server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Details
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### The Problem
 
-## Learn More
+Subscription management for physical products (veggie boxes, diapers, coffee) is broken. Every service builds an e-commerce shop first, then bolts subscriptions on top. The result: interfaces designed for browsing, not managing.
 
-To learn more about Next.js, take a look at the following resources:
+### The Solution
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+An adaptive subscription interface that:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Knows your context** — Urgent deadline? Minimal UI. Plenty of time? Let's explore.
+2. **Learns your preferences** — "You always swap fennel. Want me to just do that?"
+3. **Delights with visuals** — AI-generated images of your box and recipes
+4. **Feels like a conversation** — Not a shop, not a dashboard, something warmer
 
-## Deploy on Vercel
+### Key Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Time-adaptive UI**: Same app looks completely different based on urgency (< 12h: urgent mode, > 72h: browse mode)
+- **Smart suggestions**: Pattern detection learns from swap history and proactively recommends
+- **AI box images**: Beautiful food photography generated on confirmation via Gemini
+- **Persona simulation**: Dev panel for instant switching between demo users and time contexts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Demo Scenario
+
+The prototype simulates weekly vegetable box subscriptions with three personas:
+
+| Persona | Name  | Story                        |
+|---------|-------|------------------------------|
+| New     | Sarah | Just signed up, exploring    |
+| Regular | Mark  | 3 weeks in, hates fennel     |
+| Power   | Lisa  | Engaged, vegetarian, curious |
+
+### Architecture
+
+See `docs/project-plan.md` for the full product vision and `docs/phases/` for implementation details across 8 phases.
