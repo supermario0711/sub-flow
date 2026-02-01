@@ -137,7 +137,7 @@ export async function swapItem(
   if (box.status === "confirmed") {
     const { error: revertError } = await supabase
       .from("boxes")
-      .update({ status: "draft", updated_at: new Date().toISOString() })
+      .update({ status: "draft", image_url: null, updated_at: new Date().toISOString() })
       .eq("id", boxId);
     if (revertError) {
       return { success: false, error: "Failed to update box status." };
@@ -207,7 +207,7 @@ export async function removeItem(
   if (box.status === "confirmed") {
     const { error: revertError } = await supabase
       .from("boxes")
-      .update({ status: "draft", updated_at: new Date().toISOString() })
+      .update({ status: "draft", image_url: null, updated_at: new Date().toISOString() })
       .eq("id", boxId);
     if (revertError) {
       return { success: false, error: "Failed to update box status." };
@@ -233,7 +233,7 @@ export async function editBox(boxId: string): Promise<never> {
 
   await supabase
     .from("boxes")
-    .update({ status: "draft", updated_at: new Date().toISOString() })
+    .update({ status: "draft", image_url: null, updated_at: new Date().toISOString() })
     .eq("id", boxId)
     .eq("status", "confirmed");
 

@@ -102,6 +102,7 @@ CREATE POLICY "box_images_service_write"
 - **Gemini 2.5 Flash over DALL-E/Stability** — faster generation, already in Google Cloud ecosystem for later A2UI integration
 - **Supabase Storage over external CDN** — zero additional infrastructure, public bucket serves via CDN automatically
 - **Client-triggered generation with polling** — image generation is triggered on `/confirm` mount via server action, client polls every 3s with rotating status messages until the image is ready (max 60s)
+- **Cache-busting on image URL** — stored URL includes `?v=<timestamp>` so re-generated images bypass browser/CDN caches
 - **Supabase secret key for Storage** — uses `SUPABASE_SECRET_KEY` (`sb_secret_`) for server-side Storage uploads, not the service role key
 
 ## Files to Create
@@ -117,7 +118,7 @@ CREATE POLICY "box_images_service_write"
 
 ## Files to Modify
 - `package.json` — Add `framer-motion` dependency
-- `app/actions/box.ts` — Call `generateBoxImage` after `confirmBox` (fire-and-forget, no await blocking redirect)
+- `app/actions/box.ts` — Clear `image_url` on revert to draft (swap, remove, editBox)
 - `app/confirm/page.tsx` — Replace Phase 5 placeholder with `BoxImage` component, add animations
 - `components/box/box-view.tsx` — Wrap item list with `AnimatePresence` + `motion.div` for stagger animations
 - `components/box/box-item-card.tsx` — Add `motion.div` wrapper with layout animation
@@ -130,27 +131,30 @@ CREATE POLICY "box_images_service_write"
 ```
 confirmBox (server action)
   → set box status = 'confirmed'
-  → fire generateBoxImage(boxId, items) (no await — runs in background)
   → redirect to /confirm
+
+/confirm (server page)
+  → getConfirmedBox(userSlug)
+  → pass box.id + box.image_url to ConfirmContent → BoxImage
+
+BoxImage (client component)
+  → if imageUrl: <Image> with onLoad fade-in
+  → if null:
+    → show emoji grid fallback (🥕🥦🍎🍌🫑)
+    → call triggerBoxImageGeneration server action (once on mount)
+    → poll getBoxImageUrl every 3s with rotating status messages
+    → when URL arrives, cross-fade from emoji grid to AI image
+    → stop after 60s if no image
 
 generateBoxImage (server-only)
   → build prompt from item names
   → call Gemini 2.5 Flash image generation
-  → upload PNG to Supabase Storage 'box-images/{boxId}.png'
-  → update boxes.image_url with public URL
-
-/confirm (server page)
-  → getConfirmedBox(userSlug)
-  → if box.image_url → pass to BoxImage component
-  → if null → BoxImage shows emoji fallback
-
-BoxImage (client component)
-  → if imageUrl: <Image> with onLoad fade-in
-  → if null: emoji grid fallback (🥕🥦🍎🍌🫑)
+  → upload PNG to Supabase Storage 'box-images/{boxId}.png' (upsert)
+  → update boxes.image_url with public URL + cache-busting ?v= param
 ```
 
 ## Environment Variables
 - `GEMINI_API_KEY` — API key for Gemini 2.5 Flash image generation (stored in `.env.local`, never committed)
 
 ## Status
-**Not started**
+**WIP** — Image regeneration on box edit implemented; visual polish pending.

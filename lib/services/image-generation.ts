@@ -95,10 +95,12 @@ export async function generateBoxImage(
       data: { publicUrl },
     } = supabase.storage.from("box-images").getPublicUrl(filePath);
 
-    // Update box record with image URL
+    // Update box record with image URL (append cache-buster so
+    // Next.js Image / browser cache serves the fresh version)
+    const versionedUrl = `${publicUrl}?v=${Date.now()}`;
     const { error: updateError } = await supabase
       .from("boxes")
-      .update({ image_url: publicUrl })
+      .update({ image_url: versionedUrl })
       .eq("id", boxId);
 
     if (updateError) {

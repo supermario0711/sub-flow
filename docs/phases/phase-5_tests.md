@@ -19,15 +19,16 @@
 - [ ] Builds prompt from item names with food photography style direction
 - [ ] Calls Gemini 2.5 Flash image generation API
 - [ ] Uploads generated PNG to Supabase Storage `box-images/{boxId}.png`
-- [ ] Updates `boxes.image_url` with the public storage URL
+- [ ] Updates `boxes.image_url` with the public storage URL + `?v=<timestamp>` cache-buster
 - [ ] Handles API errors gracefully (logs error, does not throw — image is non-critical)
 - [ ] Has `import "server-only"` directive
 - [ ] `GEMINI_API_KEY` read from `process.env`, not hardcoded
 
 ## Server Action — box.ts (modified)
-- [ ] `confirmBox` calls `generateBoxImage` after setting status to `confirmed`
-- [ ] Image generation is fire-and-forget (does not block redirect to `/confirm`)
-- [ ] Redirect to `/confirm` still works even if image generation fails
+- [ ] `confirmBox` redirects to `/confirm` without triggering image generation
+- [ ] `swapItem` on confirmed box clears `image_url` (set to null)
+- [ ] `removeItem` on confirmed box clears `image_url` (set to null)
+- [ ] `editBox` clears `image_url` (set to null)
 
 ## Loading Skeletons — box-skeleton.tsx
 - [ ] Renders 5 skeleton item cards matching `BoxItemCard` height/width
@@ -91,6 +92,11 @@
 - [ ] `useReducedMotion()` hook used to disable spring/stagger animations
 - [ ] `motion-reduce:transition-none` applied on all elements with CSS transitions
 - [ ] App is fully functional with reduced motion (no information lost)
+
+## Image Cache-Busting
+- [ ] Re-confirming a box after edit generates a new image with a different `?v=` param
+- [ ] Browser shows the new image, not the old cached version
+- [ ] Old image file remains in Supabase Storage (not deleted)
 
 ## Persona-Specific Behavior
 - [ ] **Mark** (urgent): confirm button pulses, swap suggestion slides in, confirm → image generates

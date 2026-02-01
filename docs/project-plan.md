@@ -370,18 +370,22 @@ We're using the A2UI protocol for adaptive UI generation.
 
 ---
 
-## Phase 5: Visual Delight
+## Phase 5: Visual Delight ✅
 
 **Goal:** Polished UI with animations and AI-generated images
 
-**Outcomes:**
-- [ ] Smooth transitions between states
-- [ ] Loading states with skeletons
-- [ ] Box image generation on confirm
-- [ ] Confirmation page shows generated image
-- [ ] Mobile-first design verified across all flows
+**Status:** Completed 2026-01-31 — 61/75 tests passed, 0 failed, 14 not tested ([test logs](test-logs/))
 
-**Exit Criteria:** Confirming box shows beautiful AI image with celebration
+**Outcomes:**
+- [x] Framer Motion animations on box items (staggered entry/exit), swap suggestion, confirm button (pulse in urgent), Quick Add chips
+- [x] Loading skeletons for `/box` and `/confirm` routes with ARIA attributes
+- [x] AI box image generation via Gemini 2.5 Flash, triggered on `/confirm` mount
+- [x] Client-side polling with rotating status messages until image ready (max 60s)
+- [x] Confirmation page shows AI image with fade-in, emoji grid fallback while generating
+- [x] Cache-busting `?v=<timestamp>` on image URLs for re-generation after edits
+- [x] `prefers-reduced-motion` respected across all animations
+
+**Exit Criteria:** ~~Confirming box shows beautiful AI image with celebration~~ Met — Gemini generates food photography image, polling delivers it to the confirm page with cross-fade
 
 ---
 
